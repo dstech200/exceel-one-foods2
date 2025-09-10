@@ -3,8 +3,9 @@
 import type React from "react"
 
 import { useEffect, useState } from "react"
+import { v4 as uuidv4 } from 'uuid';
 import { motion } from "framer-motion"
-import { Plus, Edit, Trash2, MoreHorizontal, Search } from "lucide-react"
+import { Plus, Edit, Trash2, MoreHorizontal, Search, Loader2Icon } from "lucide-react"
 import Image from "next/image"
 import { AdminLayout } from "@/components/admin/admin-layout"
 import { Button } from "@/components/ui/button"
@@ -37,10 +38,11 @@ import { formatCurrency } from "@/lib/utils"
 import type { MenuItem } from "@/lib/types"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
+import { supabase } from "@/lib/supabase"
 
 export default function MenuPage() {
   const { isAuthenticated } = useAdminStore()
-  const { items, categories, addItem, updateItem, deleteItem, toggleAvailability } = useMenuStore()
+  const { items, category, addItem, updateItem, deleteItem, toggleAvailability } = useMenuStore()
   const [filteredItems, setFilteredItems] = useState<MenuItem[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
@@ -56,6 +58,47 @@ export default function MenuPage() {
   })
   const router = useRouter()
   const { toast } = useToast()
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  // Handle file selection
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string); // Set the preview image
+      };
+      reader.readAsDataURL(file); // Read the image as a data URL
+    }
+  };
+
+  // Upload image to Supabase
+  const uploadImage = async () => {
+    if (!selectedImage) return;
+
+    setUploading(true);
+    const fileName = `${Date.now()}-${uuidv4()}.${selectedImage.name.split('.').pop()?.toLowerCase()}`; // Use unique filename to avoid conflicts
+    try {
+      const { data, error } = await supabase.storage
+        .from('joto-foods') // Your bucket name
+        .upload(fileName, selectedImage, {
+          cacheControl: '3600', // Optional: Set cache control
+          upsert: false, // Optional: Set to true to overwrite file with the same name
+        });
+      const publicURL = "https://xmuogagalwlwgdydrjmu.supabase.co/storage/v1/object/public/" + data?.fullPath
+
+      if (error) throw error;
+      return publicURL
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -95,7 +138,7 @@ export default function MenuPage() {
     setEditingItem(null)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!formData.name || !formData.price || !formData.category) {
@@ -108,29 +151,46 @@ export default function MenuPage() {
     }
 
     const itemData = {
-      id: "",
       name: formData.name,
       description: formData.description,
       price: Number.parseFloat(formData.price),
       category: formData.category,
       image_url: formData.image_url || "/placeholder.svg?height=250&width=400",
       is_available: formData.is_available,
-      created_at: "",
-      updated_at: ""
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
 
     if (editingItem) {
-      updateItem(editingItem.id, itemData)
-      toast({
-        title: "Item Updated",
-        description: `${formData.name} has been updated successfully`,
-      })
+      try {
+        const imageUrl = await uploadImage();
+        itemData.image_url = imageUrl as string || formData.image_url || "/placeholder.svg?height=250&width=400";
+        updateItem(editingItem.id, itemData);
+        toast({
+          title: "Item Updated",
+          description: `${formData.name} has been updated successfully`,
+        });
+      } catch {
+        toast({
+          title: "failed",
+          description: `${formData.name} has not been updated to the menu`,
+        })
+      }
     } else {
-      addItem(itemData)
-      toast({
-        title: "Item Added",
-        description: `${formData.name} has been added to the menu`,
-      })
+      try {
+        const imageUrl = await uploadImage();
+        itemData.image_url = imageUrl as string || formData.image_url || "/placeholder.svg?height=250&width=400";
+        await addItem(itemData)
+        toast({
+          title: "Item Added",
+          description: `${formData.name} has been added to the menu`,
+        })
+      } catch {
+        toast({
+          title: "failed",
+          description: `${formData.name} has not been added to the menu`,
+        })
+      }
     }
 
     resetForm()
@@ -225,7 +285,7 @@ export default function MenuPage() {
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                       <SelectContent>
-                        {categories.map((category) => (
+                        {category.map((category) => (
                           <SelectItem key={category} value={category}>
                             {category}
                           </SelectItem>
@@ -233,14 +293,41 @@ export default function MenuPage() {
                       </SelectContent>
                     </Select>
                   </div>
+
+                  {/* image upload  */}
                   <div className="grid gap-2">
-                    <Label htmlFor="image">Image URL</Label>
+                    {/* <Label htmlFor="image">Image URL</Label>
                     <Input
                       id="image"
                       value={formData.image_url}
                       onChange={(e) => setFormData((prev) => ({ ...prev, image: e.target.value }))}
                       placeholder="https://example.com/image.jpg"
+                    /> */}
+                    {/* File input */}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="border p-2"
                     />
+
+                    {/* Image preview 
+                    {imagePreview && (
+                      <div className="w-64 h-64 border border-gray-300">
+                        <img src={imagePreview} alt="Image preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}*/}
+
+                    {/* Display loading state
+                    {uploading && <p>Uploading...</p>}
+
+                    {/* Display uploaded image */}
+                    {/* {imageUrl && (
+                      <div className="mt-4">
+                        <h3>Uploaded Image:</h3>
+                        <img src={imageUrl} alt="Uploaded" className="w-64 h-64 object-cover" />
+                      </div>
+                    )} */}
                   </div>
                   <div className="flex items-center space-x-2">
                     <Switch
@@ -255,7 +342,7 @@ export default function MenuPage() {
                   <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                     Cancel
                   </Button>
-                  <Button type="submit">{editingItem ? "Update Item" : "Add Item"}</Button>
+                  <Button disabled={uploading} type="submit">{uploading && <Loader2Icon className="animate-spin" />}{editingItem ? "Update Item" : "Add Item"}</Button>
                 </DialogFooter>
               </form>
             </DialogContent>
@@ -284,7 +371,7 @@ export default function MenuPage() {
           </Card>
           <Card>
             <CardContent className="p-4">
-              <div className="text-2xl font-bold">{categories.length}</div>
+              <div className="text-2xl font-bold">{category.length}</div>
               <p className="text-xs text-muted-foreground">Categories</p>
             </CardContent>
           </Card>
@@ -314,7 +401,7 @@ export default function MenuPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map((category) => (
+                  {category.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
                     </SelectItem>

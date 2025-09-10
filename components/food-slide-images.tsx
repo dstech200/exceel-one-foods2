@@ -45,11 +45,15 @@ import {
 
 export function FoodSlide() {
   const plugin = React.useRef(
-    Autoplay({ delay: 2000, stopOnInteraction: true })
+    Autoplay({ delay: 2000, stopOnInteraction: false, })
   )
 
   return (
     <Carousel
+      opts={{
+        align: "start",
+        loop: true,
+      }}
       plugins={[plugin.current]}
       className="w-full pt-5 max-w-xs"
       onMouseEnter={plugin.current.stop}

@@ -16,12 +16,13 @@ interface AdminState {
 
 interface MenuStore {
   items: MenuItem[]
-  categories: string[]
+  category: string[]
   addItem: (item: Omit<MenuItem, "id">) => void
   updateItem: (id: string, item: Partial<MenuItem>) => void
   deleteItem: (id: string) => void
   toggleAvailability: (id: string) => void
   setItems: (items: MenuItem[]) => void
+  setCategory: (items: string[]) => void
 }
 
 interface OrderManagementStore {
@@ -68,17 +69,14 @@ export const useAdminStore = create<AdminState>()(
 )
 
 
-
 export const useMenuStore = create<MenuStore>((set, get) => {
   const store: MenuStore = {
     items: [],
-    categories: ["Pizza", "Burgers", "Appetizers", "Drinks", "Main Course", "Desserts"],
-
+    category: [],
     addItem: async (item) => {
       try {
         const newItem = await db.addMenuItem(item) // Call your db method to add item to Supabase
         set((state: any) => ({ items: [...state.items, newItem] }))
-        console.log("item added")
       } catch (error) {
         console.log("Failed to add menu item:", error)
       }
@@ -120,16 +118,23 @@ export const useMenuStore = create<MenuStore>((set, get) => {
     },
 
     setItems: (items) => set({ items }),
+    setCategory: (category: string[]) => set({ category }),
   }
-
-  // Initial fetch to populate items from Supabase on store creation
-  db.getMenuItems()
-    .then((items: any) => set({ items }))
-    .catch((error) => console.error("Failed to fetch menu items:", error))
 
   return store
 
 })
+// Initial fetch to populate items from Supabase on store creation
+export const initializeMenuStore = async () => {
+  const menuItems: MenuItem[] = await db.getMenuItems();
+  const category: string[] = Array.from(new Set(menuItems.map((item: MenuStore) => item.category)));
+  // Populate the store with data
+  useMenuStore.getState().setItems(menuItems);
+  useMenuStore.getState().setCategory(category);
+};
+
+
+initializeMenuStore()
 
 export const useOrderManagementStore = create<OrderManagementStore>((set) => ({
   orders: [],
