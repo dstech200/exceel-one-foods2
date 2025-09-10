@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Smartphone } from "lucide-react"
+import { ArrowLeft, Smartphone, MapPin } from "lucide-react"
 import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,18 +16,26 @@ import { Separator } from "@/components/ui/separator"
 import { useCartStore, useLocationStore } from "@/lib/store"
 import { formatCurrency } from "@/lib/utils"
 import { useToast } from "@/hooks/use-toast"
+import { useLocation } from "@/components/location-provider"
+import { useAuth } from "@/components/auth-provider"
+import { LocationDialog } from "@/components/location-dialog"
+import { LoginDialog } from "@/components/login-dialog"
 
 export default function CheckoutPage() {
   const router = useRouter()
   const { toast } = useToast()
   const { items, getSubtotal, clearCart, orderType } = useCartStore()
-  const { location, deliveryInfo, dineInInfo } = useLocationStore()
+  const { location, deliveryInfo, dineInInfo }: any = useLocationStore()
+  const { requestLocation, isLoading } = useLocation()
+  const { user, loading: authLoading } = useAuth()
+  const { email, role, user_metadata, last_sign_in_at } = user ? user : {};
+  const { name, phone, email_verified, phone_verified } = user_metadata ? user_metadata : {};
 
-  const [customerInfo, setCustomerInfo] = useState({
-    name: "",
-    phone: "",
-    email: "",
-  })
+  const customerInfo = {
+    name: name,
+    phone: phone,
+    email: email,
+  }
   const [paymentMethod, setPaymentMethod] = useState("mpesa")
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -151,37 +159,24 @@ export default function CheckoutPage() {
                   <CardTitle>Customer Information</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Full Name *</Label>
-                    <Input
-                      id="name"
-                      value={customerInfo.name}
-                      onChange={(e) => setCustomerInfo((prev) => ({ ...prev, name: e.target.value }))}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="phone">Phone Number *</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="+255 XXX XXX XXX"
-                      value={customerInfo.phone}
-                      onChange={(e) => setCustomerInfo((prev) => ({ ...prev, phone: e.target.value }))}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={customerInfo.email}
-                      onChange={(e) => setCustomerInfo((prev) => ({ ...prev, email: e.target.value }))}
-                    />
-                  </div>
+                  {user ?
+                    <div>
+                      <div>
+                        <strong>Name:</strong> {customerInfo?.name}
+                      </div>
+                      <div>
+                        <strong>Phone:</strong> {customerInfo?.phone}
+                      </div>
+                      <div>
+                        <strong>Email:</strong> {customerInfo?.email}
+                      </div>
+                    </div>
+                    :
+                    <div className="">
+                      <p className="text-xl text-muted-foreground mb-8">Please sign in to proceed with checkout</p>
+                      <LoginDialog />
+                    </div>
+                  }
                 </CardContent>
               </Card>
 
@@ -204,7 +199,21 @@ export default function CheckoutPage() {
                         )}
                       </div>
                     ) : (
-                      <p className="text-muted-foreground">Please set your delivery location</p>
+                      <div>
+                        <p className="text-muted-foreground">Please set your delivery location</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            requestLocation()
+                          }}
+                          disabled={isLoading}
+                          className="justify-start"
+                        >
+                          <MapPin className="h-4 w-4 mr-2" />
+                          {location ? location.city : "Set Location"}
+                        </Button>
+                      </div>
                     )
                   ) : dineInInfo ? (
                     <div className="space-y-2">
@@ -227,8 +236,13 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                   ) : (
-                    <p className="text-muted-foreground">Please set your dine-in location</p>
+                    <div>
+                      <p className="text-muted-foreground">Please set your dine-in location</p>
+                    </div>
                   )}
+                  <div className="pt-2">
+                    <LocationDialog />
+                  </div>
                 </CardContent>
               </Card>
 

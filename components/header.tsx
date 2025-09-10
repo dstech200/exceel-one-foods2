@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuth } from "@/components/auth-provider"
+import Image from "next/image"
+import Logo from "../public/favicon.ico"
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -30,12 +32,13 @@ export function Header() {
   const { requestLocation, isLoading } = useLocation()
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
-  const { email, role, user_metadata, last_sign_in_at } = user ? user: {};
-  const { name, phone, email_verified, phone_verified } = user_metadata?user_metadata:{};
+  const { email, role, user_metadata, last_sign_in_at } = user ? user : {};
+  const { name, phone, email_verified, phone_verified } = user_metadata ? user_metadata : {};
 
   const itemCount = getItemCount()
   const handleLogout = async () => {
     await supabase.auth.signOut()
+    isMenuOpen && setIsMenuOpen(false)
     router.push("/")
   }
 
@@ -44,8 +47,13 @@ export function Header() {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-              <Hotel className="h-4 w-4 text-primary-foreground" />
+            <div className="h-8 w-8 rounded-full flex items-center justify-center">
+              <Image
+                src={Logo}
+                alt=""
+                width={30}
+                height={30}
+              />
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-lg leading-none">Exceel One</span>
@@ -109,34 +117,36 @@ export function Header() {
             </Link>
 
             {/*user content*/}
-            {user && 
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="/userplaceholder.png" alt={name} />
-                      <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{name}</p>
-                      <p className="text-xs leading-none text-muted-foreground">{email}</p>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              }
+            {user &&
+              <div className="hidden md:block">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src="/userplaceholder.png" alt={name} />
+                        <AvatarFallback>{name?.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">{email}</p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Profile</DropdownMenuItem>
+                    <DropdownMenuItem>Settings</DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            }
 
             {/* Mobile Menu Toggle */}
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -176,6 +186,21 @@ export function Header() {
                 >
                   Contact
                 </Link>
+                <Link
+                  href="/my-orders"
+                  className="text-sm font-medium hover:text-primary transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Orders
+                </Link>
+                {user &&
+                  <button onClick={handleLogout}>
+                    <div className="flex items-center">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </div>
+                  </button>
+                }
                 {orderType === "delivery" && (
                   <Button
                     variant="ghost"

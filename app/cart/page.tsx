@@ -67,10 +67,11 @@ export default function CartPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="flex items-center space-x-4 p-4 border rounded-lg"
+                    className="grid md:flex justify-between items-center space-x-4 p-4 border rounded-lg"
                   >
-                    <Image
-                      src={item.image || "/placeholder.svg"}
+                    <div>
+                      <Image
+                      src={item.image_url || "/placeholder.svg"}
                       alt={item.name}
                       width={80}
                       height={80}
@@ -82,8 +83,10 @@ export default function CartPage() {
                       <p className="text-sm text-muted-foreground line-clamp-1">{item.description}</p>
                       <p className="font-semibold text-primary">{formatCurrency(item.price)}</p>
                     </div>
+                    </div>
 
-                    <div className="flex items-center space-x-2">
+                   <div className="flex items-center justify-between mt-4 md:mt-0 w-full md:w-auto space-x-4">
+                     <div className="flex items-center space-x-2">
                       <Button variant="outline" size="icon" onClick={() => updateQuantity(item.id, item.quantity - 1)}>
                         <Minus className="h-4 w-4" />
                       </Button>
@@ -101,6 +104,7 @@ export default function CartPage() {
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
+                   </div>
                   </motion.div>
                 ))}
               </CardContent>
@@ -158,6 +162,12 @@ export default function CartPage() {
                   <Link href="/checkout" className="w-full">
                     <Button className="w-full" size="lg">
                       Proceed to Checkout
+                    </Button>
+                  </Link>
+
+                  <Link href="/" className=" w-full">
+                    <Button variant="outline" className="mt-2 w-full" size="lg">
+                      Continue Shopping
                     </Button>
                   </Link>
 

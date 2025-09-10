@@ -32,7 +32,7 @@ export function MenuFilters({
       </div>
 
       {/* Categories */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex justify-center flex-wrap gap-2">
         <Button
           variant={selectedCategory === "all" ? "default" : "outline"}
           size="sm"

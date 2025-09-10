@@ -12,6 +12,7 @@ import { LoginDialog } from "@/components/login-dialog"
 import { db } from "@/lib/database"
 import type { MenuItem } from "@/lib/types"
 import Image from 'next/image'
+import { FoodSlide } from "@/components/food-slide-images"
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState("all")
@@ -20,7 +21,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, loading: authLoading } = useAuth()
-  
+
 
   // Fetch menu items from Supabase
   useEffect(() => {
@@ -57,7 +58,7 @@ export default function HomePage() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-        <Header  />
+        <Header />
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
@@ -65,24 +66,9 @@ export default function HomePage() {
     )
   }
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-        <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center py-12">
-            <h1 className="text-4xl font-bold mb-4">Welcome to Exceel One Hotel</h1>
-            <p className="text-xl text-muted-foreground mb-8">Please sign in to view our menu and place orders</p>
-            <LoginDialog />
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <Header  />
+      <Header />
 
       <main className="container mx-auto px-4 py-8">
         {/* How to Receive Your Order - Primary Focus */}
@@ -90,7 +76,7 @@ export default function HomePage() {
           <HowToReceiveOrder />
         </motion.section> */}
 
-        {/* Order Type Selection */}
+        {/* Order Type Selection 
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -98,19 +84,32 @@ export default function HomePage() {
           className="mb-12"
         >
           <OrderTypeSelector />
-        </motion.section>
+        </motion.section>*/}
+
+        {!user &&
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-8">
+              <LoginDialog />
+              <div className="flex justify-center">
+                <FoodSlide />
+              </div>
+            </div>
+          </div>
+        }
 
         {/* Menu Section */}
         <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
           <div className="mb-8">
             <h2 className="text-3xl font-bold mb-6 text-center">Our Menu</h2>
-            <MenuFilters
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-            />
+            <div className="">
+              <MenuFilters
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+              />
+            </div>
           </div>
 
           {/* Loading State */}

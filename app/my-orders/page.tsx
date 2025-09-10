@@ -167,7 +167,7 @@ export default function MyOrdersPage() {
               >
                 <Card>
                   <CardHeader>
-                    <div className="flex items-center justify-between">
+                    <div className="grid md:flex items-center justify-between">
                       <div>
                         <CardTitle className="flex items-center space-x-2">
                           <span>Order {order.order_number}</span>
@@ -181,7 +181,7 @@ export default function MyOrdersPage() {
                           {new Date(order.created_at).toLocaleTimeString()}
                         </CardDescription>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="mt-5 md:mt-0 flex items-center justify-center md:justify-end space-x-2">
                         {canConfirmReceipt && (
                           <Button onClick={() => handleConfirmReceipt(order.id)} size="sm">
                             Confirm Receipt
