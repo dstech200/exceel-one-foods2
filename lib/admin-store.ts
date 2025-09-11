@@ -46,10 +46,10 @@ export const useAdminStore = create<AdminState>()(
 
       login: async (email: string, password: string) => {
         // Simple admin authentication - in production, use proper auth
-        if (email === "demo@temboplus.com" && password === "Uy3883nhks&$_") {
+        if ((email === "demo@temboplus.com" && password === "Uy3883nhks&$_") || (email === "demo@exceelhotel.com" && password === "exceelone2025")) {
           const adminUser = {
-            id: "admin-1",
-            email: "demo@temboplus.com",
+            id: email,
+            email: email,
             name: "Admin User",
           }
           set({ isAuthenticated: true, adminUser })

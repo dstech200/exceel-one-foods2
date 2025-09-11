@@ -16,6 +16,7 @@ export default function OrderConfirmationPage({ params }: { params: { id: string
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+
   useEffect(() => {
     const fetchOrder = async () => {
       try {
@@ -35,10 +36,7 @@ export default function OrderConfirmationPage({ params }: { params: { id: string
         setLoading(false)
       }
     }
-
-    if (params.id) {
-      fetchOrder()
-    }
+    fetchOrder()
   }, [params.id])
 
   if (loading) {
@@ -53,24 +51,24 @@ export default function OrderConfirmationPage({ params }: { params: { id: string
         </main>
       </div>
     )
-  }
+  } else
 
-  if (error || !order) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold mb-4">Order Not Found</h1>
-            <p className="text-muted-foreground mb-6">{error || "The order you're looking for doesn't exist."}</p>
-            <Link href="/">
-              <Button>Back to Menu</Button>
-            </Link>
-          </div>
-        </main>
-      </div>
-    )
-  }
+    if (error || !order) {
+      return (
+        <div className="min-h-screen bg-background">
+          <Header />
+          <main className="container mx-auto px-4 py-8">
+            <div className="text-center">
+              <h1 className="text-3xl font-bold mb-4">Order Not Found</h1>
+              <p className="text-muted-foreground mb-6">{error || "The order you're looking for doesn't exist."}</p>
+              <Link href="/">
+                <Button>Back to Menu</Button>
+              </Link>
+            </div>
+          </main>
+        </div>
+      )
+    }
 
   const getStatusColor = (status: string) => {
     switch (status) {

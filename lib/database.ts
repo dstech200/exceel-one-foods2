@@ -415,6 +415,7 @@ class SupabaseDatabase {
       supabase.removeChannel(subscription)
     }
   }
+
 }
 
 export const db = new SupabaseDatabase()
