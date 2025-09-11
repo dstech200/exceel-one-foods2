@@ -38,32 +38,31 @@ export default function CustomersPage() {
     // Fetch orders and process customer data
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/orders")
-        const ordersData: Order[] = await response.json()
+        const ordersData: Order[] = orders
         setOrders(ordersData)
 
         // Process customer data from orders
         const customerMap = new Map<string, CustomerData>()
 
         ordersData.forEach((order) => {
-          const customerId = order.customerInfo.phone // Using phone as unique identifier
+          const customerId = order.customer_info.email
 
           if (customerMap.has(customerId)) {
             const customer = customerMap.get(customerId)!
             customer.totalOrders += 1
             customer.totalSpent += order.total
-            if (new Date(order.createdAt) > customer.lastOrderDate) {
-              customer.lastOrderDate = new Date(order.createdAt)
+            if (new Date(order.created_at) > customer.lastOrderDate) {
+              customer.lastOrderDate = new Date(order.created_at)
             }
           } else {
             customerMap.set(customerId, {
               id: customerId,
-              name: order.customerInfo.name,
-              phone: order.customerInfo.phone,
-              email: order.customerInfo.email,
+              name: order.customer_info.name,
+              phone: order.customer_info.phone,
+              email: order.customer_info.email,
               totalOrders: 1,
               totalSpent: order.total,
-              lastOrderDate: new Date(order.createdAt),
+              lastOrderDate: new Date(order.created_at),
               status: "active",
             })
           }

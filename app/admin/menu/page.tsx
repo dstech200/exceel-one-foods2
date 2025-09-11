@@ -304,6 +304,7 @@ export default function MenuPage() {
                       placeholder="https://example.com/image.jpg"
                     /> */}
                     {/* File input */}
+                    <Label htmlFor="image">Image *</Label>
                     <input
                       type="file"
                       accept="image/*"
@@ -333,7 +334,7 @@ export default function MenuPage() {
                     <Switch
                       id="available"
                       checked={formData.is_available}
-                      onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, available: checked }))}
+                      onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, is_available: checked }))}
                     />
                     <Label htmlFor="available">Available</Label>
                   </div>
@@ -469,7 +470,10 @@ export default function MenuPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-xl font-bold text-primary">{formatCurrency(item.price)}</span>
                         <Badge variant={item.is_available ? "default" : "secondary"}>
-                          {item.is_available ? "Available" : "Out of Stock"}
+                          {item.is_available ? "Available" :
+                            <button onClick={() => toggleAvailability(item.id)}>
+                              {!item.is_available && "Mark Available"}
+                            </button>}
                         </Badge>
                       </div>
                     </CardContent>

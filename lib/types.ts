@@ -81,14 +81,14 @@ export interface Order {
   subtotal: number
   deliveryFee: number
   total: number
-  customerInfo: CustomerInfo
+  customer_info: CustomerInfo
   orderType: "delivery" | "dine-in"
   deliveryAddress?: string
   dineInInfo?: DineInInfo
   paymentMethod: string
   status: "pending" | "confirmed" | "preparing" | "ready" | "delivered" | "cancelled"
   baseLocation?: BaseLocation
-  createdAt: Date
+  created_at: Date
 }
 
 export interface CustomerInfo {

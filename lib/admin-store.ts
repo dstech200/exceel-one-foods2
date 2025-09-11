@@ -95,7 +95,8 @@ export const useMenuStore = create<MenuStore>((set, get) => {
 
     deleteItem: async (id) => {
       try {
-        await db.deleteMenuItem(id) // Delete from Supabase
+        const deleted = await db.deleteMenuItem(id) // Delete from Supabase
+        console.log("the deleted item" + deleted)
         set((state) => ({
           items: state.items.filter((item) => item.id !== id),
         }))
@@ -126,7 +127,7 @@ export const useMenuStore = create<MenuStore>((set, get) => {
 })
 // Initial fetch to populate items from Supabase on store creation
 export const initializeMenuStore = async () => {
-  const menuItems: MenuItem[] = await db.getMenuItems();
+  const menuItems: MenuItem[] = await db.getAdminMenuItems();
   const category: string[] = Array.from(new Set(menuItems.map((item: MenuStore) => item.category)));
   // Populate the store with data
   useMenuStore.getState().setItems(menuItems);

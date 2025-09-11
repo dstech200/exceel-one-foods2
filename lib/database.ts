@@ -73,6 +73,16 @@ class SupabaseDatabase {
     return data || []
   }
 
+  async getAdminMenuItems(): Promise<MenuItem[]> {
+    const { data, error } = await supabase
+      .from("menu_items")
+      .select("*")
+      .order("category", { ascending: true })
+
+    if (error) throw error
+    return data || []
+  }
+
   async addMenuItem(item: Omit<MenuItem, "id">): Promise<MenuItem> {
     console.log()
     const { data, error } = await supabase
@@ -386,7 +396,7 @@ class SupabaseDatabase {
   // Real-time subscriptions
   subscribeToOrders(callback: (orders: DatabaseOrder[]) => void): () => void {
     const subscription = supabase
-      .channel("orders")
+      .channel("joto-foods")
       .on("postgres_changes", { event: "*", schema: "public", table: "orders" }, async () => {
         const orders = await this.getAllOrders()
         callback(orders)
