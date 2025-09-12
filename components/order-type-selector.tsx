@@ -21,7 +21,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-export function OrderTypeSelector() {
+
+export function OrderTypeSelector({ onClickHandler }: { onClickHandler: any }) {
   const { orderType, setOrderType } = useCartStore()
   const { setDineInInfo, dineInInfo } = useLocationStore()
   const [open, setOpen] = useState(false)
@@ -60,6 +61,7 @@ export function OrderTypeSelector() {
     setDineInInfo(info)
     setShowDineInForm(false)
     setOpen(false)
+    onClickHandler()
   }
 
   return (
@@ -78,7 +80,7 @@ export function OrderTypeSelector() {
               <Card
                 className={`cursor-pointer transition-colors ${orderType === "delivery" ? "ring-2 ring-primary bg-primary/5" : "hover:bg-muted/50"
                   }`}
-                onClick={() => handleOrderTypeChange("delivery")}
+                onClick={() => { handleOrderTypeChange("delivery"); onClickHandler() }}
               >
                 <CardContent className="p-6 text-center">
                   <Truck className="h-8 w-8 mx-auto mb-3 text-primary" />

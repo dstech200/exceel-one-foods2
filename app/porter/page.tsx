@@ -39,13 +39,15 @@ export default function PorterDashboard() {
 
   useEffect(() => {
     if (!authLoading && !user) {
+      console.log("user data" + JSON.stringify(user))
       router.push("/")
       return
     }
 
     // Check if user has porter role
     if (user && user.user_metadata?.role !== "porter") {
-      router.push("/")
+      console.log("user data" + JSON.stringify(user))
+      //router.push("/")
       return
     }
   }, [user, authLoading, router])
@@ -279,9 +281,8 @@ export default function PorterDashboard() {
                             <span className="text-sm">
                               {order.order_type === "delivery"
                                 ? order.delivery_address
-                                : `${order.dine_in_info?.location} ${
-                                    order.dine_in_info?.room ? `- Room ${order.dine_in_info.room}` : ""
-                                  } ${order.dine_in_info?.table ? `- Table ${order.dine_in_info.table}` : ""}`}
+                                : `${order.dine_in_info?.location} ${order.dine_in_info?.room ? `- Room ${order.dine_in_info.room}` : ""
+                                } ${order.dine_in_info?.table ? `- Table ${order.dine_in_info.table}` : ""}`}
                             </span>
                           </div>
                         </TableCell>

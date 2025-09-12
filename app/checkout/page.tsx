@@ -97,11 +97,12 @@ export default function CheckoutPage() {
 
       if (response.ok) {
         const order = await response.json()
+        await router.prefetch(`/order-confirmation/${order.id}`);
         toast({
           title: "Order Placed Successfully!",
           description: `Your order #${order.id} has been confirmed`,
         })
-        router.push(`/order-confirmation/${order.id}`)
+        await router.push(`/order-confirmation/${order.id}`)
         clearCart()
       } else {
         throw new Error("Failed to place order")

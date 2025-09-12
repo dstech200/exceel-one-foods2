@@ -22,7 +22,7 @@ export function LocationDialog() {
         <Button size="lg">Set new location</Button>
       </DialogTrigger>
       <DialogContent className="pt-10 sm:max-w-[425px]">
-        <OrderTypeSelector />
+        <OrderTypeSelector onClickHandler={() => setOpen(false)} />
       </DialogContent>
     </Dialog>
   )
