@@ -102,7 +102,6 @@ export default function CheckoutPage() {
           description: `Your order #${order.id} has been confirmed`,
         })
         router.push(`/order-confirmation/${order.id}`)
-        clearCart()
       } else {
         throw new Error("Failed to place order")
       }

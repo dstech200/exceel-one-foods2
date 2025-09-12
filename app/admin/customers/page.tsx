@@ -38,7 +38,7 @@ export default function CustomersPage() {
     // Fetch orders and process customer data
     const fetchData = async () => {
       try {
-        const ordersData: Order[] = orders
+        const ordersData: Order[] = await orders
         setOrders(ordersData)
 
         // Process customer data from orders

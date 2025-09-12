@@ -13,6 +13,7 @@ import { db } from "@/lib/database"
 import type { MenuItem } from "@/lib/types"
 import Image from 'next/image'
 import { FoodSlide } from "@/components/food-slide-images"
+import { useMenuStore } from "@/lib/admin-store"
 
 export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState("all")
@@ -21,6 +22,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, loading: authLoading } = useAuth()
+  const { items } = useMenuStore()
 
 
   // Fetch menu items from Supabase
@@ -28,8 +30,8 @@ export default function HomePage() {
     const fetchMenuItems = async () => {
       try {
         setLoading(true)
-        const items: any = await db.getMenuItems()
-        setMenuItems(items)
+        const item: any = await db.getMenuItems()
+        setMenuItems(item)
       } catch (err) {
         console.log("Error fetching menu items:", err)
         setError("Failed to load menu items")

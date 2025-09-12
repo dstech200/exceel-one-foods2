@@ -10,11 +10,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { db, type DatabaseOrder } from "@/lib/database"
 import { formatCurrency } from "@/lib/utils"
+import { useCartStore, useLocationStore } from "@/lib/store"
 
 export default function OrderConfirmationPage({ params }: { params: { id: string } }) {
   const [order, setOrder] = useState<DatabaseOrder | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { clearCart } = useCartStore()
 
 
   useEffect(() => {
@@ -34,6 +36,7 @@ export default function OrderConfirmationPage({ params }: { params: { id: string
         setError("Failed to load order details")
       } finally {
         setLoading(false)
+        clearCart()
       }
     }
     fetchOrder()
