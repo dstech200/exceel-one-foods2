@@ -1,5 +1,5 @@
 // ✅ Add this at the top
-const ALLOWED_ORIGINS = ['http://localhost:3000', 'https://yourdomain.com']
+const ALLOWED_ORIGINS = [`${process.env.NEXT_BASE_URL as string}`]
 const INTERNAL_API_KEY = process.env.INTERNAL_API_KEY
 
 import { NextResponse } from 'next/server'
