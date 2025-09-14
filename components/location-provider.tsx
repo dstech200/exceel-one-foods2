@@ -11,7 +11,7 @@ const LocationContext = createContext<{
   requestLocation: () => Promise<void>
   isLoading: boolean
 }>({
-  requestLocation: async () => {},
+  requestLocation: async () => { },
   isLoading: false,
 })
 
@@ -24,14 +24,16 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true)
     try {
       const location = await getCurrentLocation()
-      setLocation(location)
+
 
       // Find nearest base location
-      const nearestBase = findNearestBaseLocation(location, baseLocations)
+      const activeLocations = baseLocations.filter(item => item.isActive === true)
+      const nearestBase = findNearestBaseLocation(location, activeLocations)
 
       if (nearestBase) {
+        setLocation(location)
         const distance = calculateDistance(location, nearestBase)
-        const fee = calculateDeliveryFee(distance)
+        const fee = await calculateDeliveryFee(distance)
         const estimatedTime = estimateDeliveryTime(distance)
 
         setDeliveryInfo({

@@ -60,6 +60,41 @@ export interface MenuItem {
   is_available: boolean
 }
 
+export interface HotelInfo {
+  id: string;
+  hotel_name: string;
+  description: string;
+  address: string;
+  phone: string;
+  email: string;
+  base_delivery_fee: number;
+  per_km_fee: number;
+  max_delivery_distance: number;
+  estimated_prep_time: number;
+  email_notifications: boolean;
+  order_alerts: boolean;
+  low_stock_alerts: boolean;
+  clickpesa_enabled: boolean;
+  mpesa_enabled: boolean;
+  airtel_money_enabled: boolean;
+  tigo_pesa_enabled: boolean;
+  maintenance_mode: boolean;
+  auto_accept_orders: boolean;
+  require_order_confirmation: boolean;
+  sms_notifications: boolean;
+}
+
+export interface BaseLocation {
+  id: string,
+  name: string,
+  address: string,
+  latitude: string,
+  longitude: string,
+  isActive: boolean,
+  deliveryRadius: number,
+  createdAt: Date,
+}
+
 class SupabaseDatabase {
   // Menu Items
   async getMenuItems(): Promise<MenuItem[]> {
@@ -84,7 +119,6 @@ class SupabaseDatabase {
   }
 
   async addMenuItem(item: Omit<MenuItem, "id">): Promise<MenuItem> {
-    console.log()
     const { data, error } = await supabase
       .from("menu_items")
       .insert([item])
@@ -424,6 +458,79 @@ class SupabaseDatabase {
     return () => {
       supabase.removeChannel(subscription)
     }
+  }
+
+
+  // hotel setting information
+
+  async getHotelInformation() {
+    const { data, error } = await supabase
+      .from("hotel_information")
+      .select("*")
+
+    if (error) throw error
+    return data || []
+  }
+
+  async updateHotelInformation(id: string, updates: Partial<HotelInfo>): Promise<HotelInfo> {
+    const { data, error } = await supabase
+      .from("hotel_information")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  }
+
+  async getBaseLocation() {
+    const { data, error } = await supabase
+      .from("base_locations")
+      .select("*")
+
+    if (error) throw error
+    return data || []
+  }
+
+  async addBaseLocation(item: Omit<BaseLocation, "id">): Promise<BaseLocation> {
+    const { data, error } = await supabase
+      .from("base_locations")
+      .insert(item)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  }
+
+  async updateBaseLocation(id: string, updates: Partial<BaseLocation>): Promise<BaseLocation> {
+    const { data, error } = await supabase
+      .from("base_locations")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  }
+
+  async toggleLocationStatus(id: string, status: boolean) {
+    const { data, error } = await supabase
+      .from("base_locations")
+      .update({ isActive: status })
+      .eq("id", id)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  }
+
+  async deleteLocation(id: string): Promise<void> {
+    const { error } = await supabase.from("base_locations").delete().eq("id", id)
+    if (error) throw error
   }
 
 }

@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import type { UserLocation, BaseLocation } from "./types"
+import { db } from "@/lib/database"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -8,15 +9,15 @@ export function cn(...inputs: ClassValue[]) {
 
 export function calculateDistance(userLocation: UserLocation, baseLocation: BaseLocation): number {
   const R = 6371 // Earth's radius in kilometers
-  const dLat = toRad(userLocation.latitude - baseLocation.latitude)
-  const dLon = toRad(userLocation.longitude - baseLocation.longitude)
+  const dLat = toRad(userLocation.latitude - Number(baseLocation.latitude))
+  const dLon = toRad(userLocation.longitude - Number(baseLocation.longitude))
 
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(baseLocation.latitude)) *
-      Math.cos(toRad(userLocation.latitude)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2)
+    Math.cos(toRad(Number(baseLocation.latitude))) *
+    Math.cos(toRad(Number(userLocation.latitude))) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2)
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
   const distance = R * c
@@ -28,14 +29,20 @@ function toRad(degrees: number): number {
   return degrees * (Math.PI / 180)
 }
 
-export function calculateDeliveryFee(distance: number): number {
-  // Base fee + distance-based fee (Tanzanian Shilling)
-  const baseFee = 2000 // 2000 TZS base fee
-  const perKmFee = 500 // 500 TZS per km
+export async function calculateDeliveryFee(distance: number): Promise<number> {
+  // Fetch hotel info
+  const data: any = await db.getHotelInformation();
+  const settingItems: any = data[0];
 
-  if (distance <= 2) return baseFee
-  return baseFee + Math.ceil(distance - 2) * perKmFee
+  // ✅ Convert to numbers safely
+  const baseFee: number = Number(settingItems?.base_delivery_fee ?? 0); // e.g. 2000 TZS
+  const perKmFee: number = Number(settingItems?.per_km_fee ?? 0);        // e.g. 500 TZS
+  console.log("the data in the utils", baseFee + " per km" + perKmFee);
+
+  if (distance <= 2) return baseFee;
+  return baseFee + Math.ceil(distance - 2) * perKmFee;
 }
+
 
 export function estimateDeliveryTime(distance: number): string {
   const baseTime = 20 // 20 minutes base time

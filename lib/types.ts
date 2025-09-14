@@ -52,8 +52,8 @@ export interface BaseLocation {
   id: string
   name: string
   address: string
-  latitude: number
-  longitude: number
+  latitude: string
+  longitude: string
   isActive: boolean
   deliveryRadius: number
   createdAt: Date

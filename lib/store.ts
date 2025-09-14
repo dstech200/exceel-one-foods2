@@ -9,6 +9,7 @@ import type {
   BaseLocation,
   SelectedCustomization,
 } from "./types"
+import { db } from "@/lib/database"
 
 interface CartStore {
   items: CartItem[]
@@ -31,6 +32,10 @@ interface LocationStore {
   setDeliveryInfo: (info: DeliveryInfo) => void
   setDineInInfo: (info: DineInInfo) => void
   setBaseLocations: (locations: BaseLocation[]) => void
+  useToggleLocationStatus: (id: string, status: boolean) => void; // Toggle isActive based on location id
+  useLocationSubmit: (newLocation: BaseLocation) => void; // Submit new or updated location
+  useDeleteLocation: (id: string) => void; // Delete location by id
+  useEditLocation: (id: string, updatedLocation: BaseLocation) => void; // Edit location
 }
 
 export const useCartStore = create<CartStore>()(
@@ -100,24 +105,56 @@ export const useCartStore = create<CartStore>()(
   ),
 )
 
+
 export const useLocationStore = create<LocationStore>((set) => ({
   location: null,
   deliveryInfo: null,
   dineInInfo: null,
-  baseLocations: [
-    {
-      id: "1",
-      name: "Exceel One Hotel - Main Branch",
-      address: "Msasani Peninsula, Dar es Salaam",
-      latitude: -6.6629659,
-      longitude: 39.187075,
-      isActive: true,
-      deliveryRadius: 15,
-      createdAt: new Date(),
-    },
-  ],
+  baseLocations: [],
+
   setLocation: (location) => set({ location }),
   setDeliveryInfo: (deliveryInfo) => set({ deliveryInfo }),
   setDineInInfo: (dineInInfo) => set({ dineInInfo }),
   setBaseLocations: (baseLocations) => set({ baseLocations }),
-}))
+
+  // Toggle the status of a location (active or inactive)
+  useToggleLocationStatus: async (id: string, status: boolean) => {
+    await db.toggleLocationStatus(id, status)
+  },
+
+  // Submit new or updated location (assuming it's added or updated to the database)
+  useLocationSubmit: async (newLocation) => {
+    // Optionally add logic to submit this to the database
+    // Example:
+    await db.addBaseLocation(newLocation);
+  },
+
+  // Delete a location by ID
+  useDeleteLocation: async (id) => {
+    // Optionally add logic to delete the location from the database
+    // Example:
+    await db.deleteLocation(id);
+  },
+
+  // Edit a specific location's details
+  useEditLocation: async (id, updatedLocation) => {
+    // Optionally add logic to update the location in the database
+    // Example:
+    await db.updateBaseLocation(id, updatedLocation);
+
+    // set((state) => {
+    //   const updatedLocations = state.baseLocations.map((loc) =>
+    //     loc.id === updatedLocation.id ? { ...loc, ...updatedLocation } : loc
+    //   );
+    //   return { baseLocations: updatedLocations };
+    // });
+  },
+}));
+
+// Initializing the store
+export const initializeLocationStore = async () => {
+  const locationItems: BaseLocation[] = await db.getBaseLocation();
+  useLocationStore.getState().setBaseLocations(locationItems);
+};
+
+initializeLocationStore();
