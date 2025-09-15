@@ -22,7 +22,7 @@ const foodImages = [
   },
   {
     key: "design-inspiracao",
-    url: "/foods/Inspiração de design exclusivo, tudo em uma….jpeg"
+    url: "/foods/tydytujyfiuy756756e65dytfjyvhgcrd4.jpeg"
   },
   {
     key: "red-velvet-strawberry-cheesecake",
@@ -30,7 +30,7 @@ const foodImages = [
   },
   {
     key: "seasoned-beef",
-    url: "/foods/Savor the perfect blend of seasoned beef, melted….jpeg"
+    url: "/foods/tryhtguyuf64554687987yhfrtxrgd.jpeg"
   }
 ];
 
