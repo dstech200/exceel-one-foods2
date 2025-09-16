@@ -54,7 +54,7 @@ type HotelInfo = {
 }
 
 export default function SettingsPage() {
-  const { isAuthenticated } = useAdminStore()
+  const { isAuthenticated, currentUser } = useAdminStore()
   const { baseLocations, setBaseLocations, useToggleLocationStatus, useLocationSubmit, useEditLocation, useDeleteLocation } = useLocationStore()
   const router = useRouter()
   const { toast } = useToast()
@@ -123,6 +123,12 @@ export default function SettingsPage() {
       router.push("/admin/login")
       return
     }
+
+    if (currentUser?.role !== "admin") {
+      router.push("/admin")
+      return
+    }
+
   }, [isAuthenticated, router])
 
   const handleSave = () => {

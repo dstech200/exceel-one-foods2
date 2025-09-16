@@ -7,10 +7,11 @@ import { db } from "./database"
 
 interface AdminState {
   isAuthenticated: boolean
-  adminUser: {
+  currentUser: {
     id: string
     email: string
     name: string
+    role: string
   } | null
   login: (email: string, password: string) => Promise<boolean>
   logout: () => void
@@ -20,26 +21,38 @@ export const useAdminStore = create<AdminState>()(
   persist(
     (set, get) => ({
       isAuthenticated: false,
-      adminUser: null,
+      currentUser: null,
 
       login: async (email: string, password: string) => {
         if (
           (email === "demo@temboplus.com" && password === "Uy3883nhks&$_") ||
           (email === "demo@exceelhotel.com" && password === "exceelone2025")
         ) {
-          const adminUser = {
+          const currentUser = {
             id: email,
             email: email,
             name: "Admin User",
+            role: "admin"
           }
-          set({ isAuthenticated: true, adminUser })
+          set({ isAuthenticated: true, currentUser })
+          return true
+        } else if (
+          (email === "restaurant@exceelhotel.com" && password === "restaurant2025")
+        ) {
+          const currentUser = {
+            id: email,
+            email: email,
+            name: "Restaurant user",
+            role: "restaurant"
+          }
+          set({ isAuthenticated: true, currentUser })
           return true
         }
         return false
       },
 
       logout: () => {
-        set({ isAuthenticated: false, adminUser: null })
+        set({ isAuthenticated: false, currentUser: null })
       },
     }),
     {
@@ -114,7 +127,7 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
 }))
 
 export const initializeMenuStore = async () => {
-  const menuItems: MenuItem[] = await db.getAdminMenuItems()
+  const menuItems: any = await db.getAdminMenuItems()
   const category: string[] = Array.from(new Set(menuItems.map((item: MenuItem) => item.category)))
   useMenuStore.getState().setItems(menuItems)
   useMenuStore.getState().setCategory(category)
@@ -148,7 +161,7 @@ export const useOrderManagementStore = create<OrderManagementStore>((set, get) =
 
   fetchOrders: async () => {
     try {
-      const orders = await db.getAllOrders()
+      const orders: any = await db.getAllOrders()
       set({ orders })
     } catch (error) {
       console.error("Failed to fetch orders:", error)

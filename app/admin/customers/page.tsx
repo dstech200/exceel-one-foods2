@@ -22,7 +22,7 @@ interface CustomerData extends CustomerInfo {
 }
 
 export default function CustomersPage() {
-  const { isAuthenticated } = useAdminStore()
+  const { currentUser, isAuthenticated } = useAdminStore()
   const { orders, setOrders } = useOrderManagementStore()
   const [customers, setCustomers] = useState<CustomerData[]>([])
   const [filteredCustomers, setFilteredCustomers] = useState<CustomerData[]>([])
@@ -32,6 +32,11 @@ export default function CustomersPage() {
   useEffect(() => {
     if (!isAuthenticated) {
       router.push("/admin/login")
+      return
+    }
+
+    if (currentUser?.role !== "admin") {
+      router.push("/admin")
       return
     }
 

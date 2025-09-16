@@ -38,13 +38,9 @@ interface AdminLayoutProps {
   children: React.ReactNode
 }
 
-const navigation = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
-  { name: "Menu", href: "/admin/menu", icon: ChefHat },
-  { name: "Customers", href: "/admin/customers", icon: Users },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
-]
+
+
+
 
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -52,6 +48,22 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter()
   const { currentUser, logout } = useAdminStore()
   const { theme, setTheme } = useTheme()
+
+  const navigation =
+    currentUser?.role === "admin"
+      ? [
+        { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+        { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
+        { name: "Menu", href: "/admin/menu", icon: ChefHat },
+        { name: "Customers", href: "/admin/customers", icon: Users },
+        { name: "Settings", href: "/admin/settings", icon: Settings },
+      ]
+      : [
+        { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+        { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
+        { name: "Menu", href: "/admin/menu", icon: ChefHat },
+      ];
+
 
   const handleLogout = () => {
     logout()
@@ -87,11 +99,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
+                className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${isActive
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}
                 onClick={() => setSidebarOpen(false)}
               >
                 <item.icon className="h-5 w-5" />
@@ -120,11 +131,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                  isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                }`}
+                className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${isActive
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}
               >
                 <item.icon className="h-5 w-5" />
                 <span>{item.name}</span>
@@ -166,7 +176,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src="/placeholder.svg" alt={currentUser?.name} />
+                      {/* <AvatarImage src="/placeholder.svg" alt={currentUser?.name} /> */}
                       <AvatarFallback>{currentUser?.name?.charAt(0)}</AvatarFallback>
                     </Avatar>
                   </Button>

@@ -23,8 +23,8 @@ interface DashboardStats {
 }
 
 export default function AdminDashboard() {
-  const { isAuthenticated, adminUser } = useAdminStore()
-  const { orders, loading, error, refetch } = useRealTimeOrders()
+  const { isAuthenticated, currentUser } = useAdminStore()
+  const { orders, loading, error, refreshOrders } = useRealTimeOrders()
   const [stats, setStats] = useState<DashboardStats>({
     totalRevenue: 0,
     totalOrders: 0,
@@ -113,11 +113,11 @@ export default function AdminDashboard() {
           <div>
             <h1 className="text-3xl font-bold">Dashboard</h1>
             <p className="text-muted-foreground">
-              Welcome back{adminUser?.name ? `, ${adminUser.name}` : ""}! Here's what's happening with your restaurant
+              Welcome back{currentUser?.name ? `, ${currentUser.name}` : ""}! Here's what's happening with your restaurant
               today.
             </p>
           </div>
-          <Button onClick={refetch} variant="outline" size="sm" disabled={loading}>
+          <Button onClick={refreshOrders} variant="outline" size="sm" disabled={loading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
             Refresh
           </Button>
@@ -129,7 +129,7 @@ export default function AdminDashboard() {
             <CardContent className="pt-6">
               <div className="flex items-center space-x-2 text-red-600">
                 <span className="text-sm">Error loading dashboard data: {error}</span>
-                <Button onClick={refetch} variant="outline" size="sm">
+                <Button onClick={refreshOrders} variant="outline" size="sm">
                   Retry
                 </Button>
               </div>
@@ -217,7 +217,7 @@ export default function AdminDashboard() {
                     <span className="ml-2 text-muted-foreground">Loading orders...</span>
                   </div>
                 ) : recentOrders.length > 0 ? (
-                  recentOrders.map((order) => {
+                  recentOrders.map((order: any) => {
                     const orderId = order?.id || "Unknown"
                     const customerName = order?.customer_name || order?.customer_info?.name || "Unknown Customer"
                     const orderTotal = order?.total || order?.total_amount || 0
