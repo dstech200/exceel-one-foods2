@@ -7,10 +7,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get("category")
     const available = searchParams.get("available")
 
-    const menuItems = await db.getMenuItems({
-      category: category || undefined,
-      available: available === "true" ? true : undefined,
-    })
+    const menuItems = await db.getMenuItems()
 
     return NextResponse.json(menuItems)
   } catch (error) {

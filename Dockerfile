@@ -16,7 +16,7 @@ COPY . .
 RUN pnpm build
 
 # 6. Use a lightweight image for production
-FROM node:trixie-slim AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
 
 # Copy only necessary files from build
@@ -30,4 +30,4 @@ ENV PORT 3000
 EXPOSE 3000
 
 # Start Next.js
-CMD ["pnpm", "start"]
+CMD ["npm", "start"]

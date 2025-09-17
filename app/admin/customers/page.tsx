@@ -185,8 +185,8 @@ export default function CustomersPage() {
                 >
                   <div className="flex items-center space-x-4">
                     <Avatar>
-                      <AvatarImage src="/placeholder.svg" />
-                      <AvatarFallback>{customer.name.charAt(0)}</AvatarFallback>
+                      {/* <AvatarImage src="/placeholder.svg" /> */}
+                      <AvatarFallback>{customer.name.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div>
                       <div className="flex items-center space-x-2">
